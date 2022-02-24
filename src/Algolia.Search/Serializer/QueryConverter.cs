@@ -22,9 +22,11 @@
 */
 
 using System;
+using System.Diagnostics;
 using Algolia.Search.Models.Search;
 using Algolia.Search.Utils;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Algolia.Search.Serializer
 {
@@ -48,7 +50,21 @@ namespace Algolia.Search.Serializer
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
-            throw new NotImplementedException("Unnecessary : we don't need to deserialize the Query");
+            try
+            {
+                JObject jObject = JObject.Load(reader);
+                Query target = new Query();
+
+                serializer.Populate(jObject.CreateReader(), target);
+
+                return target;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+
+                return null;
+            }
         }
 
         public override bool CanConvert(Type objectType)
